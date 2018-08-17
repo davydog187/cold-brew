@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 .App-logo {
@@ -24,18 +25,39 @@
 }
 
 .players {
+    flex: 1;
+}
+
+.player-bank__table {
+    max-width: 1000px;
+}
+
+.player-bank tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.player-bank td {
+    margin: 0 10px;
+}
+
+.drafter {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
 }
 
 .rosters {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
+    min-width: 400px;
+ }
+
+.Collapsable h2 {
+    text-align: left;
+    cursor: pointer;
 }
 
 .teams {
     text-align: center;
+}
+
+table {
+    border-collapse: collapse;
 }

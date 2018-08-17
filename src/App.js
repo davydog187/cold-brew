@@ -8,20 +8,13 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { addPlayer, removePlayer } from "./actions";
 import Modal from "react-modal";
+import Collapsable from "./Collapsable";
 
 class App extends Component {
 
     state = {
-        view: "rosters"
     }
 
-    showRosters() {
-        this.setState({ ...this.state, view: "rosters" });
-    }
-
-    showPlayers() {
-        this.setState({ ...this.state, view: "players" });
-    }
 
     showModal = (player) => {
         console.info("show modal called");
@@ -39,12 +32,20 @@ class App extends Component {
         const teams = this.props.data.get("teams");
 
         console.log("state", this.state);
+        const styles = {
+            content: { left: "60%" },
+        }
 
         return (
-            <Modal isOpen={this.state.modal} onRequestClose={this.closeModal} >
-                <div className="teams">
+            <Modal isOpen={this.state.modal} onRequestClose={this.closeModal} style={styles}>
+                <div className="list-group">
                     {teams.map(team => {
-                        return <button onClick={() => addPlayer(this.state.player, team.get("name")) && this.closeModal()}>{team.get("name")}</button>;
+                        return (
+                            <button
+                                className="list-group-item list-group-item-action text-center"
+                                onClick={() => addPlayer(this.state.player, team.get("name")) && this.closeModal()}>{team.get("name")}
+                            </button>
+                        );
                     })}
                 </div>
             </Modal>
@@ -61,34 +62,75 @@ class App extends Component {
         const kickers = filter(this.props.data.get("kicker"), taken);
         const teams = this.props.data.get("teams");
         const { addPlayer, removePlayer } = this.props;
-        const { view } = this.state;
-        const showPlayers = view === "players";
-        const showRosters = view === "rosters";
         return (
             <div className="App">
                 <div className="App-header">
                     <img src={football} className="App-logo" alt="logo" />
                     <h2>Cold Brew - Draft System</h2>
-                    <button onClick={() => this.showRosters()}>Rosters</button>
-                    <button onClick={() => this.showPlayers()}>Players</button>
                 </div>
 
-                {showPlayers && <div className="players">
-                    <PlayerBank label="Quarterbacks" players={qbs} showModal={this.showModal} remove={removePlayer} />
-                    <PlayerBank label="Running backs" players={rbs} showModal={this.showModal} remove={removePlayer} />
-                    <PlayerBank label="Wide Receivers" players={wrs}  showModal={this.showModal} remove={removePlayer}/>
-                    <PlayerBank label="Tight Ends" players={tes}  showModal={this.showModal} remove={removePlayer}/>
-                    <PlayerBank label="Defense" players={defense}  showModal={this.showModal} remove={removePlayer}/>
-                    <PlayerBank label="Kickers" players={kickers}  showModal={this.showModal} remove={removePlayer}/>
-                </div>}
+                <div className="drafter">
+                    <div className="rosters">
+                        {teams.map(team => <Roster name={team.get("name")} players={team.get("players")} removePlayer={removePlayer}/>)}
+                    </div>
 
-                {showRosters && <div className="rosters">
-                    {teams.map(team => <Roster name={team.get("name")} players={team.get("players")} removePlayer={removePlayer}/>)}
-                </div>}
+                    <div className="players">
+                        <Collapsable label={`Wide Receivers - ${totalValue(wrs)} - ${printHighestValue(wrs)}`}>
+                            <PlayerBank players={wrs}  showModal={this.showModal} remove={removePlayer}/>
+                        </Collapsable>
+                        <Collapsable label={`Running Backs - ${totalValue(rbs)} - ${printHighestValue(rbs)}`}>
+                            <PlayerBank players={rbs} showModal={this.showModal} remove={removePlayer} />
+                        </Collapsable>
+                        <Collapsable label={`Quarterbacks - ${totalValue(qbs)} - ${printHighestValue(qbs)}`}>
+                            <PlayerBank players={qbs} showModal={this.showModal} remove={removePlayer} />
+                        </Collapsable>
+                        <Collapsable label={`Tight Ends - ${totalValue(tes)} - ${printHighestValue(tes)}`}>
+                            <PlayerBank players={tes}  showModal={this.showModal} remove={removePlayer}/>
+                        </Collapsable>
+                        <Collapsable label={`Defense - ${totalValue(defense)} - ${printHighestValue(defense)}`}>
+                            <PlayerBank players={defense}  showModal={this.showModal} remove={removePlayer}/>
+                        </Collapsable>
+                        <Collapsable label={`Kickers - ${totalValue(kickers)} - ${printHighestValue(kickers)}`}>
+                            <PlayerBank players={kickers}  showModal={this.showModal} remove={removePlayer}/>
+                        </Collapsable>
+                    </div>
+                </div>
+
                 {this.renderModal()}
             </div>
         );
     }
+}
+function totalValue(players) {
+    if (players.size === 0) return null;
+    return players.reduce((result, current) => {
+        if (current.get("value")) {
+            const number = parseFloat(current.get("value"));
+            return result + (number > 0 ? number: 0);
+        }
+
+        return result;
+    }, 0).toFixed(1);
+}
+
+function printHighestValue(players) {
+    const player = highestValuePlayer(players);
+
+    if (player) {
+        return `${player.get("name")} - ${player.get("value") || ""}`;
+    }
+
+    return "";
+}
+
+function highestValuePlayer(players) {
+    return players.reduce((highest, player) => {
+        if (parseFloat(player.get("value")) > parseFloat(highest.get("value"))) {
+            return player;
+        }
+
+        return highest;
+    }, players.first());
 }
 
 function filter(list, set) {

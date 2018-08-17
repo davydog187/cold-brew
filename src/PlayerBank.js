@@ -1,20 +1,48 @@
 import React, { Component } from "react";
 
+const FIELDS = [
+    "name",
+    "value",
+    "rank",
+    "tm_bw",
+    "tier",
+    "std_dev",
+    "sk",
+    "scarcity",
+    "position_rank",
+];
+
+const LABELS = [
+    "Name",
+    "Value",
+    "Rank",
+    "Team / Bye",
+    "Tier",
+    "StdDev",
+    "sk",
+    "Scarcity",
+    "Position Rank",
+];
+
+function createNewsLink(player) {
+    const [first, ...lastParts] = player.get("name").replace(/\(\d*\)/, "").split(" ");
+
+    const last = lastParts.join(" ");
+
+    return `http://www.rotoworld.com/content/playersearch.aspx?searchname=${last},+${first}&sport=nfl`;
+}
+
 const ShowPlayer = (showModal, player) => {
-    if (!player.get("rank")) {
-        return (
-            <div key={player.get("name")} className="player-bank__player">
-                {player.get("name")}
-                <button onClick={() => showModal(player)}>Add</button>
-            </div>
-        );
-    }
+    const name = player.get("name")
+
+    const fields = FIELDS.map(field => <td key={field}>{player.get(field)}</td>);
 
     return (
-        <div key={player.get("name")} className="player-bank__player">
-            {player.get("name")}, {player.get("rank")} {player.get("value") && player.get("value")}
-            <button onClick={() => showModal(player)}>Add</button>
-        </div>
+        <tr key={name}>
+            {fields}
+            <td key="news"><a target="_blank" href={createNewsLink(player)}>News</a></td>
+            <td key="add"><button className="btn btn-primary" onClick={() => showModal(player)}>Add</button></td>
+        </tr>
     );
 }
 
@@ -36,12 +64,16 @@ export default class PlayerBank extends Component {
 
         return (
             <div className="player-bank">
-                <h2>{label}</h2>
-                <div>{totalValue(players)}</div>
-                {players.map(ShowPlayer.bind(null, showModal))}
+                <table className="player-bank__table table table-striped table-dark">
+                    <thead>
+                        <tr>{LABELS.map(field => <th scope="col" key={field}>{field}</th>)}</tr>
+                    </thead>
+                    <tbody>
+                        {players.map(ShowPlayer.bind(null, showModal))}
+                    </tbody>
+                </table>
             </div>
         );
-
     }
 
 }

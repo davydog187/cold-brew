@@ -46,19 +46,17 @@ export default class Roster extends Component {
         const { players = [], name, removePlayer } = this.props;
         console.info("remaining", computeRemaning(players));
         return (
-            <div className="Roster">
-                <div className="Roster__name">{name} - {computeRank(players)}</div>
-                {remaining(players)}
-                <div className="Roster__players">
-                    {players.map(player => {
-                        return (
-                            <div className="roster__player" key={player.get("name")}>
-                                {player.get("name")}
-                                <button onClick={() => removePlayer(player, name)}>Remove</button>
-                            </div>
-                        );
-                    })}
+            <div className="list-group mb-4">
+                <div className="list-group-item d-flex justify-content-between align-items-center">
+                    {name} {remaining(players)} <span className="badge badge-primary badge-pill">{computeRank(players)}</span>
                 </div>
+                {players.map(player => {
+                    return (
+                        <a href="#" className="list-group-item list-group-item-action list-group-item-primary" key={player.get("name")} onClick={() => removePlayer(player, name)}>
+                            {player.get("name")} {player.get("value")} {player.get("tm_bw")}
+                        </a>
+                    );
+                })}
             </div>
         );
     }

@@ -82,32 +82,31 @@ defmodule ColdBrew do
     name,
     _,
     tm_bw,
+    _,
     rank,
-    adp,
+    _,
+    tier,
     position_rank,
+    _,
     value,
-    std_dev,
-    sk,
+    sdv,
+    _sk,
     scarcity,
-    tier
   ]) do
     %{
       name: name,
       tm_bw: tm_bw,
       rank: rank,
-      adp: adp,
       position: "qb",
       position_rank: position_rank,
       value: value,
-      std_dev: std_dev,
-      sk: sk,
+      std_dev: sdv,
       scarcity: scarcity,
       tier: tier
     }
   end
 
-  defp parse_qb(stuff) do
-    IO.inspect stuff, label: "dropping"
+  defp parse_qb([""]) do
     nil
   end
 
@@ -148,23 +147,24 @@ defmodule ColdBrew do
     name,
     tm_bw,
     rank,
-    adp,
+    _,
+    tier,
     position_rank,
     value,
     std_dev,
     sk,
-    scarcity,
+    scarcity
   ]) do
     %{
       name: name,
       tm_bw: tm_bw,
       rank: rank,
-      adp: adp,
       position: "wr",
       position_rank: position_rank,
       value: value,
       std_dev: std_dev,
       sk: sk,
+      tier: tier,
       scarcity: scarcity,
     }
   end
@@ -175,26 +175,27 @@ defmodule ColdBrew do
 
   defp parse_te([
     name,
+    _,
     tm_bw,
+    _,
     rank,
-    adp,
+    _,
+    tier,
     position_rank,
+    _,
     value,
     std_dev,
-    sk,
+    _sk,
     scarcity,
-    tier
   ]) do
     %{
       name: name,
       tm_bw: tm_bw,
       rank: rank,
-      adp: adp,
       position: "te",
       position_rank: position_rank,
       value: value,
       std_dev: std_dev,
-      sk: sk,
       scarcity: scarcity,
       tier: tier
     }
